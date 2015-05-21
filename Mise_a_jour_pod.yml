@@ -1,0 +1,57 @@
+---
+- hosts: all
+  remote_user: pod
+
+  vars:
+    # Username
+    user: pod
+    save_modif: false
+
+  tasks:
+
+
+    #- name: Copy pod to pod_next
+    #  shell: cp -r django_projects/pod  django_projects/pod_next
+    #  args:
+    #     chdir: /home/pod/
+    #     executable: /bin/bash
+
+    - name: Git  diff
+      shell: git diff > modifs.txt
+      args:
+         chdir: /home/pod/django_projects/
+      when: save_modif 
+
+    - name: Git stash
+      shell: "git stash"
+      args:
+         chdir: /home/pod/django_projects/
+      when: save_modif
+
+    - name: Git pull pod 
+      git: repo="https://github.com/ptitloup/pod.git"  
+           dest=home/pod/django_projects/pod_next
+           clone=no
+           update=yes
+
+    - name: Install requirements
+      sudo: yes
+      pip: name=requirements
+      args:
+         chdir: /home/pod/django_projects/pod_next
+
+    - name : creation bdd
+      shell: python manage.py syncdb --noinput
+      args:
+         chdir: /home/pod/django_projects/pod_next/pod_project/
+         executable: /bin/bash
+
+    - name : migration des tables
+      shell: python ./manage.py migrate
+      args:
+         chdir: /home/pod/django_projects/pod_next/pod_project/
+         executable: /bin/bash
+
+      #verification manuelle
+    #error git diff > modifs.txt 
+    #pour remplir une variable au lancement du playbook ajouter : --extra-vars "lavariable=blabla"

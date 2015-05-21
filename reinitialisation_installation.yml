@@ -1,0 +1,36 @@
+---
+- hosts: all
+  remote_user: pod
+
+  vars:
+    # Username
+    user: pod
+    # Timezone
+    timezone: 'Europe/Paris'
+
+
+
+  tasks:
+
+    - name: remove /usr/local/django_projects
+      sudo: yes
+      shell: rm -rf /usr/local/django_projects
+
+    - name: remove repository pod
+      sudo: yes
+      shell: rm -rf /home/pod/django_projects
+
+    - name: remove .my.cnf
+      sudo: yes
+      shell: rm /root/.my.cnf
+      ignore_errors: yes
+
+    - name: remove /etc/apache2/sites-avaible
+      sudo: yes
+      shell: rm /etc/apache2/sites-available/pod
+      ignore_errors: yes
+
+    - name: remove /etc/nginx/sites-available/pod.conf
+      sudo: yes
+      shell: rm /etc/nginx/sites-available/pod.conf
+      ignore_errors: yes
