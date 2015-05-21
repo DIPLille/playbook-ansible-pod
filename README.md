@@ -9,7 +9,11 @@ Ansible est un outil d'automatisation de tâches d'administration système. Il p
 
 
 Pour orchester les taches à faire sur un ou plusieurs serveurs, il faut créer des playbooks. Les playbooks sont des scripts utilisant le language YML. 
-Il y a 2 étapes pour mettre en place Pod sur un serveur : l'installation et la mise en production. 2 playbooks, installation.yml et Mise_en_production.yml font respectivement ce travail. Un troisieme playbook est présent pour la mise à jour de pod. 
+
+Nous avons, dans ce projet, développé des playbooks pour la gestion de la plateforme Pod : https://github.com/SemmLille/pod
+
+Il y a 2 étapes pour mettre en place Pod sur un serveur : l'installation et la mise en production. 2 playbooks, installation.yml et Mise_en_production.yml font respectivement ce travail. 
+Un troisieme playbook est présent pour la mise à jour d'une instance Pod.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
