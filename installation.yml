@@ -234,9 +234,9 @@
       sudo: yes
       remote_user: root
       lineinfile:
-        dest: "/etc/elasticsearch/elasticsearch-test.yml"
+        dest: "/etc/elasticsearch/elasticsearch.yml"
         regexp: "{{ item.regexp }}"
-       line: "{{ item.line }}"
+        line: "{{ item.line }}"
         backup: yes
         state: present
       with_items:
