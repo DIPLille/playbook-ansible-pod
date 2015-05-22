@@ -143,8 +143,14 @@
 
 
     - name: Git clone/pull pod 
-      git: repo="https://github.com/ptitloup/pod.git"  
+      git: repo="https://github.com/SemmLille/pod.git"  
            dest=/usr/local/django_projects/pod
+
+    - name: git pull dev
+      shell: git pull origin dev
+      args:
+         chdir: /home/pod/django_projects/pod
+         executable: /bin/bash
 
     - name: Install librairies python
       sudo: yes
@@ -169,6 +175,85 @@
       args:
          chdir: /home/pod/django_projects/pod/pod_project/
          executable: /bin/bash
+
+    #installation FFMPEG
+    - name: creation dossier FFMPEG
+      shell: mkdir ffmpeg
+      sudo: yes
+      ignore_errors: yes
+      args:
+         chdir: /usr/local/
+         executable: /bin/bash
+
+
+    - name: download ffmeg static file
+      sudo: yes
+      get_url: url=http://ffmpeg.gusari.org/static/64bit/ffmpeg.static.64bit.latest.tar.gz dest=/usr/local/ffmeg 
+
+    #- unarchive: src=/usr/local/ffmeg/ffmpeg.static.64bit.latest.tar.gz dest=/usr/local/ffmeg/
+    #  sudo: yes
+
+    - name: droit en lecture et en ecriture ffmpeg” et “ffprobe”
+      sudo: yes
+      remote_user: root
+      shell: chmod 755 ff*
+      args:
+         chdir: /usr/local/ffmpeg
+         executable: /bin/bash
+
+    #installation elasticsearch
+
+    - name :  Install openjdk 7
+      sudo: yes
+      remote_user: root
+      shell: aptitude -y install openjdk-7-jre-headless 
+      args:
+         executable: /bin/bash
+
+    - name :  Download and install the Public Signing Key
+      shell: wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+      args:
+         executable: /bin/bash
+
+    - name :  Add the repository definition to your /etc/apt/sources.list file
+      shell: echo "deb http://packages.elastic.co/elasticsearch/1.5/debian stable main" | sudo tee -a /etc/apt/sources.list
+      args:
+         executable: /bin/bash
+
+    - name :  install elasticsearch
+      shell: "sudo apt-get update && sudo apt-get install elasticsearch"
+      args:
+         executable: /bin/bash
+
+    - name :   automatically start during bootup
+      shell: "sudo update-rc.d elasticsearch defaults 95 10"
+      args:
+         executable: /bin/bash
+
+    - name: change configuration
+      sudo: yes
+      remote_user: root
+      lineinfile:
+        dest: "/etc/elasticsearch/elasticsearch-test.yml"
+        regexp: "{{ item.regexp }}"
+       line: "{{ item.line }}"
+        backup: yes
+        state: present
+      with_items:
+        - { regexp: '#cluster.name: elasticsearch', line: 'cluster.name: pod' }
+        - { regexp: '#node.name: "Franz Kafka"', line: 'node.name: "Pod1"' }
+        - { regexp: '#network.host: 192.168.0.1', line: 'network.host: 127.0.0.1' }
+        - { regexp: '#path.logs: /path/to/logs', line: 'path.logs: /usr/local/var/log' }
+        - { regexp: '#path.data: /path/to/data1,/path/to/data2', line: 'path.data: /usr/local/var/log' }
+        - { regexp: '#discovery.zen.ping.multicast.enabled: false', line: 'discovery.zen.ping.multicast.enabled: false' }
+        - { regexp: '#discovery.zen.ping.unicast.hosts:["host1", "host2:port"]', line: 'discovery.zen.ping.unicast.hosts: ["127.0.0.1"]' }
+
+    - name : lancement des tests unitaires
+      shell: python manage.py test core pods.tests.tests_models pods.tests.tests_views pods.tests.tests_delete_video
+      args:
+         chdir: /home/pod/django_projects/pod/pod_project/
+         executable: /bin/bash
+
 
     #- name : Validation et lancement du serveur .. si il n'y a pas d'erreur vous pouvez le quitter "Control-c"
     #  shell: python django_projects/pod/pod_project/manage.py runserver

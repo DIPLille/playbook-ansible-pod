@@ -16,6 +16,12 @@
     #     chdir: /home/pod/
     #     executable: /bin/bash
 
+    - name: Copie du dossier de la version de production
+      shell: cp -r pod pod_next
+      args:
+         chdir: /home/pod/django_projects/
+         executable: /bin/bash
+
     - name: Git  diff
       shell: git diff > modifs.txt
       args:
@@ -28,11 +34,11 @@
          chdir: /home/pod/django_projects/
       when: save_modif
 
-    - name: Git pull pod 
-      git: repo="https://github.com/ptitloup/pod.git"  
-           dest=home/pod/django_projects/pod_next
-           clone=no
-           update=yes
+    - name: git pull master
+      shell: git pull origin master
+      args:
+         chdir: /home/pod/django_projects/pod_next
+         executable: /bin/bash
 
     - name: Install requirements
       sudo: yes
