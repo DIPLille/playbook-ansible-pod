@@ -1,0 +1,15 @@
+---
+# Copy & configure settings.py & wsgi.py project files 
+
+- name: "create prj config files : settings.py wsgi.py"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  shell: cp -p {{ item }}-sample.py {{ item }}.py
+  args: 
+    chdir: "{{ pod_project_conf_dir }}"
+    creates: "{{ item }}.py"
+  with_items:
+    - settings
+    - wsgi
+  tags:
+    - mk_prj_config_file

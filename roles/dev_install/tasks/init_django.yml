@@ -1,0 +1,44 @@
+---
+# Django configuration"
+
+- name: "copy generic script"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  copy: src=v_env_runner.sh
+        dest="{{ pod_user_home }}"
+        mode=700
+
+- name: "copy pexpect_script template"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  template: src=pexpect_script.j2
+            dest="{{ pod_project_src_dir }}/pexpect_script.py"
+            mode=700
+
+- name: "add django cmd 4 init pod"
+  lineinfile: dest="{{ pod_user_home }}/v_env_runner.sh"
+              insertafter=EOF
+              state=present
+              line='{{ item }}'
+  with_items:
+    - "python manage.py makemigrations"
+    - "python manage.py migrate"
+    - "python manage.py loaddata core/fixtures/initial_data.json"
+    - "python pexpect_script.py"
+
+- name: "run v_env script"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  shell: "{{ pod_user_home }}/v_env_runner.sh"
+  args: 
+    chdir: "{{ pod_project_src_dir }}"
+
+- name: "remove scripts"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  file: path="{{ item }}"
+        state=absent
+  with_items :
+    - "{{ pod_project_src_dir }}/pexpect_script.py"
+    - "{{ pod_user_home }}/v_env_runner.sh"
+

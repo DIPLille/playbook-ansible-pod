@@ -1,0 +1,27 @@
+---
+#  checkout git src
+
+- name: "checkout git sources"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  git: repo={{ pod_project_git_repo }}
+       dest={{ pod_project_dir }}
+  tags:
+    - git
+
+- name: "install pip virtualenvwrapper"
+  pip: name=virtualenvwrapper state=latest
+  tags:
+    - pip
+
+- name: "create virtualenv & install requirements"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  pip: requirements={{ pod_project_dir }}/requirements.txt
+       virtualenv={{ pod_v_env_path }} 
+       virtualenv_command={{ virtual_env_cmd }}
+       virtualenv_site_packages=yes
+  tags:
+    - pip
+    - v_env
+

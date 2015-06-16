@@ -1,0 +1,36 @@
+---
+# Install Debian Wheezy/Jessie Base Packages
+
+- name: "apt refresh cache"
+  apt: update_cache=yes
+  tags:
+    - apt
+
+- name: "install Debian Wheezy / Jessie base packages"
+  apt: name={{ item }} state=latest
+  with_items:
+    - build-essential
+    - git
+    - graphviz
+    - pkg-config
+    - sudo
+    - libgraphviz-dev
+    - libldap2-dev
+    - libmysqlclient-dev
+    - libsasl2-dev
+    - libssl-dev
+    - libjpeg-dev
+    - python-pip
+    - python-dev
+    - python-chardet
+    - python-fpconst
+    - python-apt
+    - python-debian
+    - python-debianbts
+    - python-reportbug
+    - python-reportbug
+    - python-soappy
+    - python-pexpect
+  tags: 
+    - apt
+

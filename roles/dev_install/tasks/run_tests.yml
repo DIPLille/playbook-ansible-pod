@@ -1,0 +1,33 @@
+---
+# run integrated tests
+
+- name: "copy generic script"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  copy: src=v_env_runner.sh
+        dest="{{ pod_user_home }}"
+        mode=700
+
+- name: "add django integrated test cmd"
+  lineinfile: dest="{{ pod_user_home }}/v_env_runner.sh"
+              insertafter=EOF
+              state=present
+              line='{{ item }}'
+  with_items:
+    - "python manage.py test core pods.tests.tests_models pods.tests.tests_views pods.tests.tests_delete_video"
+
+- name: "run v_env script"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  shell: "{{ pod_user_home }}/v_env_runner.sh"
+  args: 
+    chdir: "{{ pod_project_src_dir }}"
+
+- name: "remove scripts"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  file: path="{{ item }}"
+        state=absent
+  with_items :
+    - "{{ pod_user_home }}/v_env_runner.sh"
+

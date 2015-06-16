@@ -1,0 +1,5 @@
+[dev_install]
+  pod-dev.univ.fr
+
+[srv:children]
+  dev_install

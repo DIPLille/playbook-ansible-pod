@@ -1,0 +1,6 @@
+---
+- name: Install & configure Pod dev context
+  hosts: srv
+  user: root
+  roles:
+   - dev_install

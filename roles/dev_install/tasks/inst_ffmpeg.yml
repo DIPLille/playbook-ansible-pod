@@ -1,0 +1,35 @@
+---
+# install ffmpeg
+
+- name: "create ffmpeg dir"
+  file: path=/usr/local/ffmpeg
+        owner=root
+        group=root
+        state=directory
+  tags:
+    - ffmpeg
+
+- name: "get ffmpeg dir"
+  get_url: url=http://ffmpeg.gusari.org/static/64bit/ffmpeg.static.64bit.latest.tar.gz
+           dest=/usr/local/ffmpeg/
+  tags:
+    - ffmpeg
+
+- name: "ffmpeg unarchive"
+  unarchive: src=/usr/local/ffmpeg/ffmpeg.static.64bit.latest.tar.gz
+               dest=/usr/local/ffmpeg/
+               copy=no
+
+- name: "ffmpeg set right"
+  file: path="/usr/local/ffmpeg/{{ item }}"
+        state=file
+        mode=755
+  with_items:
+    - ffmpeg
+    - ffprobe  
+
+# install memcached
+
+- name: "install memcached"
+  apt: name=memcached state=latest update_cache=yes
+
