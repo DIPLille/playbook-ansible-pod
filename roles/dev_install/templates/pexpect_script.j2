@@ -1,0 +1,9 @@
+import pexpect
+child = pexpect.spawn ('python manage.py createsuperuser --username root')
+child.expect ('Email.*')
+child.sendline ('{{ pod_adm_mail }}')
+child.expect ('Password.*')
+child.sendline ('{{ pod_root_pwd }}')
+child.expect ('Password.*')
+child.sendline ('{{ pod_root_pwd }}')
+child.expect(pexpect.EOF, timeout=None)

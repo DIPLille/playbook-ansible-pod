@@ -1,0 +1,8 @@
+---
+# vars  file for playbook-ansible-pod installation
+
+# Username
+user: pod
+# Timezone
+timezone: 'Europe/Paris'
+

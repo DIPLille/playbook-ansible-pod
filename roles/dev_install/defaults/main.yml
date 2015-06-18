@@ -1,0 +1,29 @@
+---
+# default
+
+project_name: pod
+project_dev_name: pod_project
+
+pod_user_name: pod
+pod_user_id: 1100
+pod_user_home: /home/{{ pod_user_name }}
+pod_user_shell: /bin/bash
+
+pod_adm_mail: mail@univ.fr
+pod_root_pwd: secret
+
+django_projects_dir: /usr/local/django_projects
+django_projects_link: "{{ pod_user_home }}/django_projects"
+
+pod_project_git_repo: https://github.com/ptitloup/pod.git
+pod_project_dir: "{{ django_projects_dir }}/{{ project_name }}"
+pod_project_link: "{{ pod_user_home }}/{{ project_name }}"
+pod_project_src_dir: "{{ pod_project_dir }}/{{ project_dev_name }}"
+pod_project_conf_dir: "{{ pod_project_src_dir }}/{{ project_dev_name }}"
+
+pod_v_env_name: django_pod
+pod_v_envs_dir: .virtualenvs
+pod_v_env_path: "{{ pod_user_home }}/{{ pod_v_envs_dir }}/{{ pod_v_env_name }}"
+virtual_env_cmd: /usr/local/bin/virtualenv
+
+

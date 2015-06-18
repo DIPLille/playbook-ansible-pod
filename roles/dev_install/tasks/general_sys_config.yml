@@ -1,0 +1,51 @@
+---
+# some nice system configuration (UNice settings ;-)
+
+- name: "install Debian Wheezy / Jessie, to have packages"
+  apt: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - chkconfig
+    - etckeeper
+    - ferm
+    - mc
+    - ntp
+    - sysstat
+    - vim
+  tags:
+    - apt
+
+- name: "vimrc configuration"
+  replace: dest=/etc/vim/vimrc
+           regexp='{{ item.value.regexp }}'
+           replace='{{ item.value.replace }}'
+           backup=yes
+  with_dict:
+    syntax on:
+      regexp: ^"syntax on
+      replace: syntax on
+    mouse on:
+      regexp: ^"set mouse=a
+      replace: set mouse=a
+  tags:
+    - configsys
+
+- name: "root .bashrc add-ons"
+  lineinfile: dest=/root/.bashrc
+              insertafter=EOF
+              state=present
+              line='{{ item }}'
+  with_items:
+    - "export LS_OPTIONS='--color=auto'"
+    - eval "`dircolors`"
+    - "#some aliases"
+    - alias "ls=ls $LS_OPTIONS"
+    - alias "ll=ls $LS_OPTIONS -Hal"
+    - alias "rm=rm -i"
+    - alias "cp=cp -i"
+    - alias "mv=mv -i"
+    - "#colorized prompt"
+    - PS1="\[$(tput setaf 1)\]\u\[$(tput sgr0)\]@\[$(tput setaf 4)\]\h\[$(tput sgr0)\]:\w# "
+  tags:
+    - configsys
+
+

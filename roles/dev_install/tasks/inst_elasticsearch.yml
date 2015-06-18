@@ -1,0 +1,77 @@
+---
+# install & configure elasticsearch
+
+- name: "openjdk-7-jre install"
+  apt: name=openjdk-7-jre-headless
+       state=latest 
+       update_cache=yes
+  tags:
+    - jre_install
+
+- name: "elasticsearch repository key install"
+  apt_key: url=https://packages.elastic.co/GPG-KEY-elasticsearch 
+           state=present
+  tags:
+    - elasticsearch_repo_key
+
+- name: "elastic search repository add"
+  apt_repository: repo='deb http://packages.elastic.co/elasticsearch/1.5/debian stable main'
+                  state=present
+  tags:
+    - elasticsearch_repo_add
+
+- name: "elasticsearch install"
+  apt: name=elasticsearch
+       state=latest 
+       update_cache=yes
+  tags:
+    - elasticsearch_install
+
+- name : "electicsearch default configure"
+  lineinfile: dest="/etc/default/elasticsearch"
+              insertafter=EOF
+              state=present
+              line="{{ item }}"
+  with_items:
+    - '# Elasticsearch log directory'
+    - 'LOG_DIR=/var/log/elasticsearch'
+    - '# Elasticsearch data directory'
+    - 'DATA_DIR=/var/lib/elasticsearch'
+    - '# Elasticsearch work directory'
+    - 'WORK_DIR=/tmp/elasticsearch'
+    - '# Elasticsearch configuration directory'
+    - 'CONF_DIR=/etc/elasticsearch'
+    - '# Elasticsearch configuration file (elasticsearch.yml)'
+    - 'CONF_FILE=/etc/elasticsearch/elasticsearch.yml'
+
+
+- name : "electicsearch configure"
+  lineinfile: dest="/etc/elasticsearch/elasticsearch.yml"
+              insertafter=EOF
+              state=present
+              line="{{ item }}"
+  with_items:
+    - 'cluster.name: {{ ansible_hostname }}'
+    - 'node.name: "{{ ansible_hostname }}1"'
+    - 'network.host: 127.0.0.1'
+    - 'discovery.zen.ping.multicast.enabled: false'
+    - 'discovery.zen.ping.unicast.hosts: ["127.0.0.1"]'
+
+- name: "configure systemd 4 elasticsearch"
+  shell: "{{ item }}"
+  with_items:
+    - /bin/systemctl daemon-reload
+    - /bin/systemctl enable elasticsearch.service
+  when: ansible_distribution_release == "jessie"
+  tags:
+    - systemd
+
+- name: "enable elasticsearch on boot"
+  service: name=elasticsearch enabled=yes
+
+- name: "start elasticsearch"
+  service: name=elasticsearch state=started
+
+
+
+

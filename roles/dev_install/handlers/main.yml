@@ -1,0 +1,10 @@
+---
+# handlers file for playbook-ansible-pod installation
+
+- name: "update tzdata"
+  command: /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata
+
+- name: "restart elasticsearch"
+  service: name=elasticsearch
+           state=restarted
+

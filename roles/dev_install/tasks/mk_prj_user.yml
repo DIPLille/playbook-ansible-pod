@@ -1,0 +1,63 @@
+---
+# Create pod user, configure accounts & generals settings
+
+- name: "Create pod user"
+  user: name={{ pod_user_name }}
+        groups=sudo
+        uid={{ pod_user_id }}
+        shell={{ pod_user_shell }}
+        home={{pod_user_home}}
+        comment="pod user"
+        state=present
+  tags: 
+    - prj_user
+
+- name: "create django_projects & pod src dir"
+  file: path={{ pod_project_dir }}
+        recurse=yes
+        owner=pod
+        group=pod
+        state=directory
+  tags:
+    - prj_src
+       
+- name: "Create django_projects link"
+  file: src={{ django_projects_dir }}
+        dest={{ django_projects_link }}
+        owner=pod
+        group=pod
+        state=link 
+  tags:
+    - prj_src
+
+- name: "pod bashrc prompt colorize"
+  replace: dest={{ pod_user_home }}/.bashrc
+           regexp='{{ item.value.regexp }}'
+           replace='{{ item.value.replace }}'
+  with_dict:
+    color prompt:
+      regexp: ^#force_color_prompt=yes
+      replace: force_color_prompt=yes
+  tags: 
+    - prj_user
+
+- name: "pod .bashrc add-ons"
+  lineinfile: dest={{ pod_user_home }}/.bashrc
+              insertafter=EOF
+              state=present
+              line='{{ item }}'
+  with_items:
+    - "#pod install add-on"
+    - "export LS_OPTIONS='--color=auto'"
+    - eval "`dircolors`"
+    - alias "ls=ls $LS_OPTIONS"
+    - alias "ll=ls $LS_OPTIONS -Hal"
+    - alias "rm=rm -i"
+    - alias "cp=cp -i"
+    - alias "mv=mv -i"
+    - PS1="${debian_chroot:+($debian_chroot)}\[$(tput setaf 2)\]\u\[$(tput sgr0)\]@\[$(tput setaf 4)\]\h\[$(tput sgr0)\]:\w$ "
+    - export WORKON_HOME=$HOME/.virtualenvs
+    - source /usr/local/bin/virtualenvwrapper.sh
+    - workon django_pod
+  tags: 
+    - prj_user

@@ -1,0 +1,35 @@
+---
+# tasks file for playbook-ansible-pod installation
+
+# install Debian base packages
+- include: inst_debian_base_pkg.yml tags=system,common
+
+# some nice system configuration (UNice settings ;-)
+- include: general_sys_config.yml tags=system,optional
+
+# create & configure prj user (pod)
+- include: mk_prj_user.yml tags=system,common
+
+# create project enironment : checkout git src, make & configure
+- include: mk_prj_env.yml tags=prj,common
+
+# create pod project config settings.py, wsgi.py 
+- include: mk_prj_conf.yml tags=prj,common
+
+# install ffmpeg
+- include: inst_ffmpeg.yml tags=add_on,common
+
+# install memcached
+- include: inst_memcached.yml tags=add_on,common
+
+# install elasticsearch
+- include: inst_elasticsearch.yml tags=add_on,common
+  
+# initialise django project
+- include: init_django.yml tags=prj,common
+
+# install & configure gettext
+- include: inst_gettext.yml tags=add_on,common
+
+# run integrated tests
+- include: run_tests.yml tags=prj,tests,optional

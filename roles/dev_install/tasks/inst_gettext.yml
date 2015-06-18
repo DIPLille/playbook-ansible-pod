@@ -1,0 +1,47 @@
+---
+# install gettext & generate .po
+
+- name: "install gettext"
+  apt: name=gettext state=latest update_cache=yes
+  tags:
+    - gettext_install
+
+- name: "gettext create locale dir"
+  file: path="{{ pod_project_src_dir }}/locale"
+        recurse=yes
+        owner=pod
+        group=pod
+        state=directory
+  tags:
+    - gettext_generate
+
+- name: "copy generic script"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  copy: src=v_env_runner.sh
+        dest="{{ pod_user_home }}"
+        mode=700
+
+- name: "add django cmd 4 gettext config"
+  lineinfile: dest="{{ pod_user_home }}/v_env_runner.sh"
+              insertafter=EOF
+              state=present
+              line="{{ item }}"
+  with_items:
+    - "django-admin.py makemessages -l fr"
+    - "django-admin.py compilemessages"
+
+- name: "run v_env script"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  shell: "{{ pod_user_home }}/v_env_runner.sh"
+  args: 
+    chdir: "{{ pod_project_src_dir }}"
+
+- name: "remove script"
+  become: yes
+  become_user: "{{ pod_user_name }}" 
+  file: path="{{ pod_user_home }}/v_env_runner.sh"
+        state=absent
+
+
