@@ -24,7 +24,7 @@
 
 # install elasticsearch
 - include: inst_elasticsearch.yml tags=add_on,common
-  
+
 # initialise django project
 - include: init_django.yml tags=prj,common
 
